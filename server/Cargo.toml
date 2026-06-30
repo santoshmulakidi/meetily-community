@@ -1,0 +1,83 @@
+[package]
+name = "meetily-server"
+version = "0.1.0"
+edition = "2021"
+description = "Meetily Community+ - Self-hosted AI meeting assistant server"
+license = "MIT"
+repository = "https://github.com/Zackriya-Solutions/meetily"
+
+[dependencies]
+# Web framework
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace", "cors", "compression-gzip"] }
+hyper = "1.1"
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async utilities
+async-trait = "0.1"
+futures = "0.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Configuration
+config = "0.14"
+dotenvy = "0.15"
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio", "postgres", "uuid", "chrono", "json"] }
+
+# Vector similarity (pgvector)
+pgvector = { version = "0.3", features = ["sqlx"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Bytes
+bytes = "1.5"
+
+# HTTP client (for external APIs)
+reqwest = { version = "0.11", features = ["json", "stream"] }
+
+# OpenAPI documentation
+utoipa = { version = "4.2", features = ["axum_extras", "chrono", "uuid"] }
+utoipa-swagger-ui = { version = "6.0", features = ["axum"] }
+
+# Authentication
+jsonwebtoken = "9.2"
+argon2 = "0.5"
+
+# Audio processing (reuse from Tauri app)
+# Note: We'll extract common audio code from frontend/src-tauri/src/audio/
+
+# Filesystem
+tokio-util = { version = "0.7", features = ["io"] }
+tempfile = "3.9"
+
+# Compression
+flate2 = "1.0"
+zip = "0.6"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockall = "0.12"
+fake = { version = "2.9", features = ["derive"] }
+glob = "0.3"
+
+[features]
+default = []
+cuda = []  # GPU acceleration for transcription
+vulkan = []  # Alternative GPU acceleration

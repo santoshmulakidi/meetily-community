@@ -1,0 +1,94 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+PHASE*_COMPLETE.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Rust
+target/
+**/target/
+Cargo.lock
+**/Cargo.lock
+
+# Build artifacts
+*.o
+*.so
+*.dll
+*.dylib
+
+# Test files
+**/tests/
+**/test_*.rs
+**/*_test.rs
+
+# Development
+.docker-dev/
+.env.local
+.env.development
+*.log
+logs/
+
+# Backups
+*.bak
+*.backup
+backups/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node (if using frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python (if using ML scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Docker
+Dockerfile.development
+docker-compose.override.yml
+docker-compose.dev.yml
+
+# Kubernetes
+*.yaml
+!docker-compose.yml
+k8s/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Testing
+coverage/
+lcov.info
+*.profraw
+*.profdata
+
+# Misc
+Makefile
+justfile
+Taskfile.yml

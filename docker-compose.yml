@@ -1,0 +1,236 @@
+version: '3.8'
+
+services:
+  # =============================================================================
+  # PostgreSQL Database with pgvector extension
+  # =============================================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: meetily-postgres
+    restart: unless-stopped
+    
+    environment:
+      POSTGRES_USER: meetily
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-meetily_secure_password_change_me}
+      POSTGRES_DB: meetily
+    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    
+    ports:
+      - "5432:5432"
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meetily -d meetily"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    
+    networks:
+      - meetily-network
+    
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # =============================================================================
+  # Meetily Community+ Server
+  # =============================================================================
+  meetily-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: meetily-server
+    restart: unless-stopped
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    environment:
+      # Database
+      DATABASE_URL: postgresql://meetily:${POSTGRES_PASSWORD:-meetily_secure_password_change_me}@postgres:5432/meetily
+      
+      # Server configuration
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      
+      # Logging
+      RUST_LOG: ${RUST_LOG:-info}
+      
+      # Storage
+      STORAGE_PATH: /var/meetily/recordings
+      
+      # API Keys (set these in .env file)
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      
+      # Transcription config
+      TRANSCRIPTION_PROVIDER: ${TRANSCRIPTION_PROVIDER:-nvidia}
+      TRANSCRIPTION_MODEL: ${TRANSCRIPTION_MODEL:-parakeet-0.6b}
+      
+      # Summary config
+      SUMMARY_PROVIDER: ${SUMMARY_PROVIDER:-openrouter}
+      SUMMARY_MODEL: ${SUMMARY_MODEL:-meta-llama/llama-3.1-70b-instruct}
+      
+      # Embedding config
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-nvidia}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nvidia/nv-embedqa-e5-v5}
+      
+      # JWT Secret (for auth - Phase 13)
+      JWT_SECRET: ${JWT_SECRET:-change_this_to_a_secure_random_string}
+    
+    volumes:
+      - recordings:/var/meetily/recordings
+      - ./logs:/app/logs
+    
+    ports:
+      - "8080:8080"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - meetily-network
+    
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # =============================================================================
+  # Ollama (Optional - for local LLMs)
+  # Comment out if not using local models
+  # =============================================================================
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: meetily-ollama
+  #   restart: unless-stopped
+  #   
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   
+  #   ports:
+  #     - "11434:11434"
+  #   
+  #   networks:
+  #     - meetily-network
+  #   
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 8G
+  #       reservations:
+  #         memory: 4G
+  #   
+  #   # Uncomment for GPU support (NVIDIA)
+  #   # deploy:
+  #   #   resources:
+  #   #     reservations:
+  #   #       devices:
+  #   #         - driver: nvidia
+  #   #           count: 1
+  #   #           capabilities: [gpu]
+
+  # =============================================================================
+  # Nginx Reverse Proxy (Optional - for production)
+  # Uncomment for production deployment
+  # =============================================================================
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: meetily-nginx
+  #   restart: unless-stopped
+  #   
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   
+  #   depends_on:
+  #     - meetily-server
+  #   
+  #   networks:
+  #     - meetily-network
+
+  # =============================================================================
+  # Prometheus Monitoring (Optional)
+  # Uncomment for production monitoring
+  # =============================================================================
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: meetily-prometheus
+  #   restart: unless-stopped
+  #   
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - prometheus_data:/prometheus
+  #   
+  #   ports:
+  #     - "9090:9090"
+  #   
+  #   networks:
+  #     - meetily-network
+
+  # =============================================================================
+  # Grafana Dashboard (Optional)
+  # Uncomment for production monitoring
+  # =============================================================================
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: meetily-grafana
+  #   restart: unless-stopped
+  #   
+  #   environment:
+  #     GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+  #   
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./monitoring/grafana:/etc/grafana/provisioning:ro
+  #   
+  #   ports:
+  #     - "3000:3000"
+  #   
+  #   depends_on:
+  #     - prometheus
+  #   
+  #   networks:
+  #     - meetily-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  recordings:
+    driver: local
+  # ollama_data:
+  #   driver: local
+  # prometheus_data:
+  #   driver: local
+  # grafana_data:
+  #   driver: local
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  meetily-network:
+    driver: bridge
