@@ -23,13 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_embeddings_meeting_id ON embeddings(meeting_id);
 CREATE INDEX IF NOT EXISTS idx_embeddings_transcript_id ON embeddings(transcript_id);
 CREATE INDEX IF NOT EXISTS idx_embeddings_created_at ON embeddings(created_at DESC);
 
--- Vector similarity index (IVFFlat for fast approximate search)
--- Lists parameter: typically 4 * sqrt(N) where N = number of rows
--- For 100K embeddings: 4 * sqrt(100000) ≈ 1260, round to 1000
-CREATE INDEX IF NOT EXISTS idx_embeddings_vector_cosine 
-    ON embeddings USING ivfflat (vector vector_cosine_ops) 
-    WITH (lists = 1000);
-
+-- ponytail: pgvector ivfflat supports up to 2000 dims; add a vector index later when dimensions are <= 2000 or use a compatible index.
 -- Alternative index for inner product (dot product similarity)
 -- CREATE INDEX IF NOT EXISTS idx_embeddings_vector_ip 
 --     ON embeddings USING ivfflat (vector vector_ip_ops) 

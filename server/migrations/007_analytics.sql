@@ -1,13 +1,26 @@
 -- Migration: Create analytics views and indexes
 -- Version: 007
 
+-- ponytail: earlier migrations reference meeting_id but never create meetings; this minimal table unblocks analytics/auth views.
+CREATE TABLE IF NOT EXISTS meetings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID,
+    name TEXT NOT NULL DEFAULT 'Untitled Meeting',
+    title TEXT,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'created',
+    tags TEXT[] NOT NULL DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Create analytics-friendly indexes
 CREATE INDEX IF NOT EXISTS idx_meetings_created_at ON meetings(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_meetings_created_at_date ON meetings(DATE(created_at));
+-- ponytail: DATE(timestamptz) is not immutable, plain created_at index is enough for deploy.
 CREATE INDEX IF NOT EXISTS idx_recordings_meeting_id_duration ON recordings(meeting_id, duration_secs);
 CREATE INDEX IF NOT EXISTS idx_transcripts_meeting_id ON transcripts(meeting_id);
 CREATE INDEX IF NOT EXISTS idx_summaries_meeting_id_type ON summaries(meeting_id, summary_type);
-CREATE INDEX IF NOT EXISTS idx_diarization_segments_speaker ON diarization_segments(diarization_id, speaker_id, duration_secs);
+CREATE INDEX IF NOT EXISTS idx_diarization_segments_speaker ON diarization_segments(diarization_id, speaker_id);
 
 -- View: Meeting statistics by date
 CREATE OR REPLACE VIEW v_meeting_daily_stats AS
@@ -32,23 +45,23 @@ CREATE OR REPLACE VIEW v_speaker_stats_per_meeting AS
 SELECT 
     d.meeting_id,
     COALESCE(ds.speaker_id, 'Unknown') as speaker_id,
-    COALESCE(sa.alias, ds.speaker_id) as speaker_name,
-    COUNT(DISTINCT ds.segment_id) as segment_count,
-    SUM(COALESCE(ds.duration_secs, 0)) as total_talk_time_secs,
+    COALESCE(sa.custom_name, ds.speaker_id) as speaker_name,
+    COUNT(DISTINCT ds.id) as segment_count,
+    SUM(GREATEST(ds.end_time_secs - ds.start_time_secs, 0)) as total_talk_time_secs,
     AVG(COALESCE(ds.confidence, 0.0)) as avg_confidence,
-    RANK() OVER (PARTITION BY d.meeting_id ORDER BY SUM(COALESCE(ds.duration_secs, 0)) DESC) as talk_rank
+    RANK() OVER (PARTITION BY d.meeting_id ORDER BY SUM(GREATEST(ds.end_time_secs - ds.start_time_secs, 0)) DESC) as talk_rank
 FROM diarizations d
 JOIN diarization_segments ds ON d.id = ds.diarization_id
-LEFT JOIN speaker_aliases sa ON ds.speaker_id = sa.speaker_id AND sa.meeting_id = d.meeting_id
-GROUP BY d.meeting_id, ds.speaker_id, sa.alias
+LEFT JOIN speaker_aliases sa ON ds.speaker_id = sa.original_speaker_id AND sa.meeting_id = d.meeting_id
+GROUP BY d.meeting_id, ds.speaker_id, sa.custom_name
 ORDER BY d.meeting_id, talk_rank;
 
 -- View: Overall speaker statistics across all meetings
 CREATE OR REPLACE VIEW v_speaker_overall_stats AS
 SELECT 
     COALESCE(ds.speaker_id, 'Unknown') as speaker_id,
-    COUNT(DISTINCT ds.segment_id) as total_segments,
-    SUM(COALESCE(ds.duration_secs, 0)) as total_talk_time_secs,
+    COUNT(DISTINCT ds.id) as total_segments,
+    SUM(GREATEST(ds.end_time_secs - ds.start_time_secs, 0)) as total_talk_time_secs,
     AVG(COALESCE(ds.confidence, 0.0)) as avg_confidence,
     COUNT(DISTINCT d.meeting_id) as meetings_participated,
     COUNT(DISTINCT d.meeting_id) * 1.0 / (SELECT COUNT(*) FROM meetings) as participation_rate
@@ -116,8 +129,8 @@ SELECT
     m.id as meeting_id,
     m.name as meeting_name,
     t.created_at as activity_time,
-    LENGTH(t.content) as metric_value,
-    'characters' as metric_unit
+    t.word_count as metric_value,
+    'words' as metric_unit
 FROM transcripts t
 JOIN meetings m ON t.meeting_id = m.id
 WHERE t.created_at >= NOW() - INTERVAL '7 days'
