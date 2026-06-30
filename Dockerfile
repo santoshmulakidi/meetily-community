@@ -4,7 +4,7 @@
 # =============================================================================
 # Stage 1: Builder - Compile the Rust application
 # =============================================================================
-FROM rust:1.85-bookworm AS builder
+FROM rust:1.88-bookworm AS builder
 
 # Set working directory
 WORKDIR /app
