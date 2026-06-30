@@ -9,23 +9,18 @@ use crate::services::recording::RecordingService;
 use crate::services::transcription::TranscriptionService;
 use crate::services::diarization::DiarizationService;
 use crate::services::summary::SummaryService;
-use crate::services::embedding::EmbeddingService;
-use crate::services::search::SearchService;
-use crate::services::chat::ChatService;
 use crate::repositories::meeting::MeetingRepository;
 use crate::repositories::embedding::EmbeddingRepository;
 
 /// Application state shared across all handlers
 /// Acts as a simple DI container
+#[derive(Clone)]
 pub struct AppState {
     pub config: AppConfig,
     pub recording_service: Arc<dyn RecordingService>,
     pub transcription_service: Arc<dyn TranscriptionService>,
     pub diarization_service: Arc<dyn DiarizationService>,
     pub summary_service: Arc<dyn SummaryService>,
-    pub embedding_service: Arc<dyn EmbeddingService>,
-    pub search_service: Arc<dyn SearchService>,
-    pub chat_service: Arc<dyn ChatService>,
     pub meeting_repo: Arc<dyn MeetingRepository>,
     pub embedding_repo: Arc<dyn EmbeddingRepository>,
 }
@@ -38,9 +33,6 @@ impl AppState {
         transcription_service: Arc<dyn TranscriptionService>,
         diarization_service: Arc<dyn DiarizationService>,
         summary_service: Arc<dyn SummaryService>,
-        embedding_service: Arc<dyn EmbeddingService>,
-        search_service: Arc<dyn SearchService>,
-        chat_service: Arc<dyn ChatService>,
         meeting_repo: Arc<dyn MeetingRepository>,
         embedding_repo: Arc<dyn EmbeddingRepository>,
     ) -> Self {
@@ -50,9 +42,6 @@ impl AppState {
             transcription_service,
             diarization_service,
             summary_service,
-            embedding_service,
-            search_service,
-            chat_service,
             meeting_repo,
             embedding_repo,
         }
@@ -66,9 +55,6 @@ pub struct AppStateBuilder {
     transcription_service: Option<Arc<dyn TranscriptionService>>,
     diarization_service: Option<Arc<dyn DiarizationService>>,
     summary_service: Option<Arc<dyn SummaryService>>,
-    embedding_service: Option<Arc<dyn EmbeddingService>>,
-    search_service: Option<Arc<dyn SearchService>>,
-    chat_service: Option<Arc<dyn ChatService>>,
     meeting_repo: Option<Arc<dyn MeetingRepository>>,
     embedding_repo: Option<Arc<dyn EmbeddingRepository>>,
 }
@@ -81,9 +67,6 @@ impl AppStateBuilder {
             transcription_service: None,
             diarization_service: None,
             summary_service: None,
-            embedding_service: None,
-            search_service: None,
-            chat_service: None,
             meeting_repo: None,
             embedding_repo: None,
         }
@@ -114,21 +97,6 @@ impl AppStateBuilder {
         self
     }
 
-    pub fn embedding_service(mut self, service: Arc<dyn EmbeddingService>) -> Self {
-        self.embedding_service = Some(service);
-        self
-    }
-
-    pub fn search_service(mut self, service: Arc<dyn SearchService>) -> Self {
-        self.search_service = Some(service);
-        self
-    }
-
-    pub fn chat_service(mut self, service: Arc<dyn ChatService>) -> Self {
-        self.chat_service = Some(service);
-        self
-    }
-
     pub fn meeting_repo(mut self, repo: Arc<dyn MeetingRepository>) -> Self {
         self.meeting_repo = Some(repo);
         self
@@ -146,9 +114,6 @@ impl AppStateBuilder {
             self.transcription_service.ok_or("transcription_service is required")?,
             self.diarization_service.ok_or("diarization_service is required")?,
             self.summary_service.ok_or("summary_service is required")?,
-            self.embedding_service.ok_or("embedding_service is required")?,
-            self.search_service.ok_or("search_service is required")?,
-            self.chat_service.ok_or("chat_service is required")?,
             self.meeting_repo.ok_or("meeting_repo is required")?,
             self.embedding_repo.ok_or("embedding_repo is required")?,
         ))

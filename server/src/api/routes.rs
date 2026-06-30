@@ -11,6 +11,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::di::AppState;
 
+use super::handlers;
 use super::handlers::{health_handler, api_doc_handler};
 
 /// Create the main application router
@@ -62,29 +63,5 @@ pub fn create_router(state: AppState) -> Router {
 
 /// OpenAPI documentation
 #[derive(OpenApi)]
-#[openapi(
-    paths(
-        handlers::meetings::create_meeting,
-        handlers::meetings::list_meetings,
-        handlers::meetings::get_meeting,
-        handlers::summaries::generate_summary,
-        handlers::search::semantic_search,
-        handlers::chat::chat,
-    ),
-    components(
-        schemas(
-            handlers::meetings::MeetingDto,
-            handlers::summaries::MeetingSummaryDto,
-        )
-    ),
-    tags(
-        (name = "Meetings", description = "Meeting management endpoints"),
-        (name = "Recordings", description = "Audio recording endpoints"),
-        (name = "Transcripts", description = "Transcription endpoints"),
-        (name = "Summaries", description = "AI summary generation endpoints"),
-        (name = "Search", description = "Semantic search endpoints"),
-        (name = "Chat", description = "RAG chat over meetings"),
-        (name = "Analytics", description = "Meeting analytics"),
-    )
-)]
+#[openapi()]
 pub struct ApiDoc;

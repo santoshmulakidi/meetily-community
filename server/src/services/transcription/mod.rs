@@ -1,9 +1,5 @@
 //! Transcription service trait and implementation
 
-mod transcription_service;
-
-pub use transcription_service::TranscriptionServiceImpl;
-
 use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
@@ -152,16 +148,11 @@ pub trait TranscriptionService: Send + Sync {
     async fn list_models(&self) -> ServiceResult<Vec<String>>;
 }
 
-/// Placeholder implementation - to be filled in Phase 4
-pub struct TranscriptionServiceImpl {
-    // Configuration and resources
-}
+pub struct TranscriptionServiceImpl;
 
 impl TranscriptionServiceImpl {
-    pub fn new(_config: TranscriptionConfig, _db_pool: sqlx::PgPool) -> Self {
-        Self {
-            // Initialize resources
-        }
+    pub fn new(_config: crate::config::TranscriptionConfig, _db_pool: sqlx::PgPool) -> Self {
+        Self
     }
 }
 
@@ -173,7 +164,7 @@ impl TranscriptionService for TranscriptionServiceImpl {
         _meeting_id: Uuid,
         _config: Option<TranscriptionConfig>,
     ) -> ServiceResult<Transcript> {
-        todo!("Implement in Phase 4")
+        todo!("transcription service is not implemented yet")
     }
 
     async fn transcribe_stream(
@@ -181,7 +172,7 @@ impl TranscriptionService for TranscriptionServiceImpl {
         _meeting_id: Uuid,
         _config: Option<TranscriptionConfig>,
     ) -> ServiceResult<Uuid> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn submit_chunk(
@@ -190,15 +181,15 @@ impl TranscriptionService for TranscriptionServiceImpl {
         _audio_data: Bytes,
         _offset_secs: f32,
     ) -> ServiceResult<TranscriptionSegment> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn get_transcript(&self, _transcript_id: Uuid) -> ServiceResult<Transcript> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn get_meeting_transcript(&self, _meeting_id: Uuid) -> ServiceResult<Option<Transcript>> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn update_transcript(
@@ -206,14 +197,14 @@ impl TranscriptionService for TranscriptionServiceImpl {
         _transcript_id: Uuid,
         _segments: Vec<TranscriptionSegment>,
     ) -> ServiceResult<Transcript> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn delete_transcript(&self, _transcript_id: Uuid) -> ServiceResult<()> {
-        todo!()
+        todo!("transcription service is not implemented yet")
     }
 
     async fn list_models(&self) -> ServiceResult<Vec<String>> {
-        todo!()
+        Ok(vec![])
     }
 }

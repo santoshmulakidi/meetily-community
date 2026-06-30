@@ -1,9 +1,5 @@
 //! Summary service trait and implementation
 
-mod summary_service;
-
-pub use summary_service::SummaryServiceImpl;
-
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -31,7 +27,7 @@ pub struct MeetingSummary {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct action_item {
+pub struct ActionItem {
     pub id: String,
     pub description: String,
     pub assignee: Option<String>,
@@ -237,16 +233,11 @@ pub trait SummaryService: Send + Sync {
     ) -> ServiceResult<Vec<u8>>;
 }
 
-/// Placeholder implementation - to be filled in Phase 6
-pub struct SummaryServiceImpl {
-    // Configuration and resources
-}
+pub struct SummaryServiceImpl;
 
 impl SummaryServiceImpl {
-    pub fn new(_config: SummaryProviderConfig, _db_pool: sqlx::PgPool) -> Self {
-        Self {
-            // Initialize resources
-        }
+    pub fn new(_config: crate::config::SummaryProviderConfig, _db_pool: sqlx::PgPool) -> Self {
+        Self
     }
 }
 
@@ -257,7 +248,7 @@ impl SummaryService for SummaryServiceImpl {
         _transcript_id: Uuid,
         _config: Option<SummaryConfig>,
     ) -> ServiceResult<MeetingSummary> {
-        todo!("Implement in Phase 6")
+        todo!("summary service is not implemented yet")
     }
 
     async fn regenerate_section(
@@ -265,15 +256,15 @@ impl SummaryService for SummaryServiceImpl {
         _summary_id: Uuid,
         _section: SummarySection,
     ) -> ServiceResult<()> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 
     async fn get_summary(&self, _summary_id: Uuid) -> ServiceResult<MeetingSummary> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 
     async fn get_meeting_summary(&self, _meeting_id: Uuid) -> ServiceResult<Option<MeetingSummary>> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 
     async fn update_summary(
@@ -281,11 +272,11 @@ impl SummaryService for SummaryServiceImpl {
         _summary_id: Uuid,
         _updates: SummaryUpdate,
     ) -> ServiceResult<MeetingSummary> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 
     async fn delete_summary(&self, _summary_id: Uuid) -> ServiceResult<()> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 
     async fn export_summary(
@@ -293,6 +284,6 @@ impl SummaryService for SummaryServiceImpl {
         _summary_id: Uuid,
         _format: ExportFormat,
     ) -> ServiceResult<Vec<u8>> {
-        todo!()
+        todo!("summary service is not implemented yet")
     }
 }

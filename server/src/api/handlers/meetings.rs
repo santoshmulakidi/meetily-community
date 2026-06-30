@@ -5,7 +5,6 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use axum::extract::Path;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

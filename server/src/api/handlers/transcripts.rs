@@ -1,7 +1,6 @@
 //! Transcripts handlers - placeholders
 
 use axum::{extract::{Path, State}, http::StatusCode};
-use axum::extract::Path;
 use uuid::Uuid;
 
 use crate::api::state::SharedState;

@@ -1,9 +1,5 @@
 //! Diarization service trait and implementation
 
-mod diarization_service;
-
-pub use diarization_service::DiarizationServiceImpl;
-
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -98,16 +94,11 @@ pub trait DiarizationService: Send + Sync {
     ) -> ServiceResult<Transcript>;
 }
 
-/// Placeholder implementation - to be filled in Phase 5
-pub struct DiarizationServiceImpl {
-    // Configuration and resources
-}
+pub struct DiarizationServiceImpl;
 
 impl DiarizationServiceImpl {
     pub fn new(_db_pool: sqlx::PgPool) -> Self {
-        Self {
-            // Initialize resources
-        }
+        Self
     }
 }
 
@@ -118,7 +109,7 @@ impl DiarizationService for DiarizationServiceImpl {
         _transcript_id: Uuid,
         _config: Option<DiarizationConfig>,
     ) -> ServiceResult<DiarizationResult> {
-        todo!("Implement in Phase 5")
+        todo!("diarization service is not implemented yet")
     }
 
     async fn diarize_audio(
@@ -127,7 +118,7 @@ impl DiarizationService for DiarizationServiceImpl {
         _transcript: Transcript,
         _config: Option<DiarizationConfig>,
     ) -> ServiceResult<DiarizationResult> {
-        todo!()
+        todo!("diarization service is not implemented yet")
     }
 
     async fn assign_speaker_name(
@@ -136,17 +127,17 @@ impl DiarizationService for DiarizationServiceImpl {
         _speaker_id: String,
         _name: String,
     ) -> ServiceResult<()> {
-        todo!()
+        todo!("diarization service is not implemented yet")
     }
 
     async fn get_speaker_stats(&self, _transcript_id: Uuid) -> ServiceResult<Vec<SpeakerInfo>> {
-        todo!()
+        Ok(vec![])
     }
 
     async fn merge_with_speaker_consistency(
         &self,
         _transcript_ids: Vec<Uuid>,
     ) -> ServiceResult<Transcript> {
-        todo!()
+        todo!("diarization service is not implemented yet")
     }
 }

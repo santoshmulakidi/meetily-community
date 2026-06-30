@@ -1,9 +1,7 @@
 //! Recording service trait and implementation
 
+#[cfg(test)]
 mod tests;
-mod recording_service;
-
-pub use recording_service::RecordingServiceImpl;
 
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -113,16 +111,13 @@ pub trait RecordingService: Send + Sync {
     async fn delete_recording(&self, recording_id: Uuid) -> ServiceResult<()>;
 }
 
-/// Placeholder implementation - to be filled in Phase 3
-pub struct RecordingServiceImpl {
-    // Configuration and resources will be added
-}
+use crate::config::StorageConfig;
+
+pub struct RecordingServiceImpl;
 
 impl RecordingServiceImpl {
     pub fn new(_config: StorageConfig, _db_pool: sqlx::PgPool) -> Self {
-        Self {
-            // Initialize resources
-        }
+        Self
     }
 }
 
@@ -130,54 +125,51 @@ impl RecordingServiceImpl {
 impl RecordingService for RecordingServiceImpl {
     async fn start_recording(
         &self,
-        meeting_id: Uuid,
-        user_id: Uuid,
-        config: Option<RecordingConfig>,
+        _meeting_id: Uuid,
+        _user_id: Uuid,
+        _config: Option<RecordingConfig>,
     ) -> ServiceResult<RecordingSession> {
-        // TODO: Implement in Phase 3
-        todo!("Implement recording start logic")
+        todo!("recording service is not implemented yet")
     }
 
-    async fn pause_recording(&self, session_id: Uuid) -> ServiceResult<()> {
-        todo!()
+    async fn pause_recording(&self, _session_id: Uuid) -> ServiceResult<()> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn resume_recording(&self, session_id: Uuid) -> ServiceResult<()> {
-        todo!()
+    async fn resume_recording(&self, _session_id: Uuid) -> ServiceResult<()> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn stop_recording(&self, session_id: Uuid) -> ServiceResult<RecordingMetadata> {
-        todo!()
+    async fn stop_recording(&self, _session_id: Uuid) -> ServiceResult<RecordingMetadata> {
+        todo!("recording service is not implemented yet")
     }
 
     async fn write_chunk(
         &self,
-        session_id: Uuid,
-        audio_data: Bytes,
-        timestamp: DateTime<Utc>,
+        _session_id: Uuid,
+        _audio_data: Bytes,
+        _timestamp: DateTime<Utc>,
     ) -> ServiceResult<u64> {
-        todo!()
+        todo!("recording service is not implemented yet")
     }
 
-    async fn get_session_status(&self, session_id: Uuid) -> ServiceResult<RecordingSession> {
-        todo!()
+    async fn get_session_status(&self, _session_id: Uuid) -> ServiceResult<RecordingSession> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn recover_session(&self, session_id: Uuid) -> ServiceResult<RecordingSession> {
-        todo!()
+    async fn recover_session(&self, _session_id: Uuid) -> ServiceResult<RecordingSession> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn get_recording(&self, recording_id: Uuid) -> ServiceResult<RecordingMetadata> {
-        todo!()
+    async fn get_recording(&self, _recording_id: Uuid) -> ServiceResult<RecordingMetadata> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn list_recordings(&self, meeting_id: Uuid) -> ServiceResult<Vec<RecordingMetadata>> {
-        todo!()
+    async fn list_recordings(&self, _meeting_id: Uuid) -> ServiceResult<Vec<RecordingMetadata>> {
+        todo!("recording service is not implemented yet")
     }
 
-    async fn delete_recording(&self, recording_id: Uuid) -> ServiceResult<()> {
-        todo!()
+    async fn delete_recording(&self, _recording_id: Uuid) -> ServiceResult<()> {
+        todo!("recording service is not implemented yet")
     }
 }
-
-use crate::config::StorageConfig;
