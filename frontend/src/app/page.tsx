@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function MeetingDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { 
     currentMeeting,
     meetingTitle,
@@ -47,24 +47,16 @@ export default function MeetingDashboard() {
 
   // Initialize on mount
   useEffect(() => {
+    if (!user) return;
     initializeRecorder().catch(console.error);
     fetchMeetings();
-  }, [initializeRecorder, fetchMeetings]);
+  }, [initializeRecorder, fetchMeetings, user]);
 
-  // Timer for recording duration
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
-      }, 1000);
-    } else if (interval) {
-      clearInterval(interval);
+    if (!isLoading && !user) {
+      router.replace('/login');
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRecording]);
+  }, [isLoading, router, user]);
 
   const handleNewMeeting = () => {
     setMeetingTitle('');
@@ -76,8 +68,12 @@ export default function MeetingDashboard() {
     router.push('/login');
   };
 
-  if (!user) {
-    return null; // Should redirect, but handled by layout
+  if (isLoading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-600">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -131,7 +127,7 @@ export default function MeetingDashboard() {
         <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
           <div className="flex items-center space-x-4">
             <h2 className="text-2xl font-bold text-gray-900">
-              {currentMeeting?.meetingTitle || meetingTitle || 'New Meeting'}
+              {currentMeeting?.meetingName || meetingTitle || 'New Meeting'}
             </h2>
             {currentMeeting && (
               <div className="flex items-center space-x-2 text-sm text-gray-500">
@@ -199,7 +195,7 @@ export default function MeetingDashboard() {
                         try {
                           await startRecording();
                         } catch (err) {
-                          alert('Failed to start recording: ' + err.message);
+                          alert('Failed to start recording: ' + (err instanceof Error ? err.message : 'Unknown error'));
                         }
                       }}
                       className="flex items-center justify-center w-16 h-16 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
@@ -270,7 +266,7 @@ export default function MeetingDashboard() {
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{meeting.meetingName}</h4>
                         <p className="text-sm text-gray-500">
-                          {new Date(meeting.createdAt).toLocaleDateString()} • 
+                          {meeting.recording?.created_at ? new Date(meeting.recording.created_at).toLocaleDateString() : 'Unknown date'} • 
                           {Math.floor(meeting.duration / 60)}:{String(meeting.duration % 60).padStart(2, '0')}
                         </p>
                       </div>

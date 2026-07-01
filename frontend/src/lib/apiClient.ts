@@ -9,7 +9,7 @@
  *   const recordings = await apiClient.recordings.list();
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://163.192.111.51:8082/api/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://163.192.111.51:8082/api';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;

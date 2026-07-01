@@ -45,7 +45,7 @@ export default function TestConnection() {
 
       // Test 2: Try to get API documentation
       logs.push('\n2. Checking API documentation...\n');
-      const docsResponse = await fetch(`${apiClient.getBaseUrl()}/docs`);
+      const docsResponse = await fetch(`${apiClient.getBaseUrl()}/api-docs/openapi.json`);
       if (docsResponse.ok) {
         logs.push('✓ API documentation available\n');
       } else {
@@ -53,7 +53,7 @@ export default function TestConnection() {
       }
 
       // Test 3: Try health endpoint
-      logs.push('\n3. Testing /api/v1/health endpoint...\n');
+      logs.push('\n3. Testing /api/health endpoint...\n');
       const healthResponse = await fetch(`${apiClient.getBaseUrl()}/health`);
       if (healthResponse.ok) {
         logs.push('✓ Health endpoint working\n');
@@ -65,7 +65,7 @@ export default function TestConnection() {
       logs.push(`✗ Error: ${error instanceof Error ? error.message : 'Unknown error'}\n`);
       logs.push('\nPossible issues:\n');
       logs.push('  - Oracle VM backend is not running\n');
-      logs.push('  - Firewall blocking port 8080\n');
+      logs.push('  - Firewall blocking port 8082\n');
       logs.push('  - CORS not configured on backend\n');
       logs.push('  - Network connectivity issue\n');
     }
@@ -108,10 +108,10 @@ export default function TestConnection() {
         <div className="mt-8 bg-gray-800 rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Expected Backend Configuration:</h2>
           <ul className="list-disc list-inside space-y-2 text-gray-300">
-            <li>Backend URL: <code className="bg-gray-700 px-2 py-1 rounded">http://163.192.111.51:8080</code></li>
-            <li>API Version: <code className="bg-gray-700 px-2 py-1 rounded">/api/v1</code></li>
-            <li>Health Check: <code className="bg-gray-700 px-2 py-1 rounded">/api/v1/health</code></li>
-            <li>Auth Endpoint: <code className="bg-gray-700 px-2 py-1 rounded">/api/v1/auth/login</code></li>
+            <li>Backend URL: <code className="bg-gray-700 px-2 py-1 rounded">http://163.192.111.51:8082</code></li>
+            <li>API Base Path: <code className="bg-gray-700 px-2 py-1 rounded">/api</code></li>
+            <li>Health Check: <code className="bg-gray-700 px-2 py-1 rounded">/api/health</code></li>
+            <li>OpenAPI JSON: <code className="bg-gray-700 px-2 py-1 rounded">/api/api-docs/openapi.json</code></li>
           </ul>
         </div>
 
@@ -119,9 +119,9 @@ export default function TestConnection() {
           <h2 className="text-xl font-semibold mb-4 text-yellow-400">Troubleshooting Tips:</h2>
           <ol className="list-decimal list-inside space-y-2 text-gray-300">
             <li>Make sure your Rust backend is running on the Oracle VM</li>
-            <li>Check that port 8080 is open in Oracle Cloud firewall</li>
+            <li>Check that port 8082 is open in Oracle Cloud firewall</li>
             <li>Verify CORS is enabled in your backend configuration</li>
-            <li>Test with: <code className="bg-gray-700 px-2 py-1 rounded">curl http://163.192.111.51:8080/health</code></li>
+            <li>Test with: <code className="bg-gray-700 px-2 py-1 rounded">curl http://163.192.111.51:8082/api/health</code></li>
           </ol>
         </div>
       </div>
