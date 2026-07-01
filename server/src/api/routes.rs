@@ -21,32 +21,32 @@ pub fn create_router(state: AppState) -> Router {
         .route("/health", get(health_handler))
         .route("/api-docs/openapi.json", get(api_doc_handler))
         // Meeting routes
-        .route("/api/v1/meetings", post(handlers::meetings::create_meeting))
-        .route("/api/v1/meetings", get(handlers::meetings::list_meetings))
-        .route("/api/v1/meetings/{id}", get(handlers::meetings::get_meeting))
-        .route("/api/v1/meetings/{id}", put(handlers::meetings::update_meeting))
-        .route("/api/v1/meetings/{id}", delete(handlers::meetings::delete_meeting))
+        .route("/meetings", post(handlers::meetings::create_meeting))
+        .route("/meetings", get(handlers::meetings::list_meetings))
+        .route("/meetings/{id}", get(handlers::meetings::get_meeting))
+        .route("/meetings/{id}", put(handlers::meetings::update_meeting))
+        .route("/meetings/{id}", delete(handlers::meetings::delete_meeting))
         // Recording routes
-        .route("/api/v1/recordings", post(handlers::recordings::create_recording))
-        .route("/api/v1/recordings/{id}", get(handlers::recordings::get_recording))
-        .route("/api/v1/recordings/{id}/pause", post(handlers::recordings::pause_recording))
-        .route("/api/v1/recordings/{id}/resume", post(handlers::recordings::resume_recording))
-        .route("/api/v1/recordings/{id}/stop", post(handlers::recordings::stop_recording))
+        .route("/recordings", post(handlers::recordings::create_recording))
+        .route("/recordings/{id}", get(handlers::recordings::get_recording))
+        .route("/recordings/{id}/pause", post(handlers::recordings::pause_recording))
+        .route("/recordings/{id}/resume", post(handlers::recordings::resume_recording))
+        .route("/recordings/{id}/stop", post(handlers::recordings::stop_recording))
         // Transcript routes
-        .route("/api/v1/transcripts", get(handlers::transcripts::list_transcripts))
-        .route("/api/v1/transcripts/{id}", get(handlers::transcripts::get_transcript))
-        .route("/api/v1/transcripts/{id}", put(handlers::transcripts::update_transcript))
+        .route("/transcripts", get(handlers::transcripts::list_transcripts))
+        .route("/transcripts/{id}", get(handlers::transcripts::get_transcript))
+        .route("/transcripts/{id}", put(handlers::transcripts::update_transcript))
         // Summary routes
-        .route("/api/v1/summaries", post(handlers::summaries::generate_summary))
-        .route("/api/v1/summaries/{id}", get(handlers::summaries::get_summary))
-        .route("/api/v1/summaries/{id}", put(handlers::summaries::update_summary))
-        .route("/api/v1/summaries/{id}/export", get(handlers::summaries::export_summary))
+        .route("/summaries", post(handlers::summaries::generate_summary))
+        .route("/summaries/{id}", get(handlers::summaries::get_summary))
+        .route("/summaries/{id}", put(handlers::summaries::update_summary))
+        .route("/summaries/{id}/export", get(handlers::summaries::export_summary))
         // Search routes
-        .route("/api/v1/search", post(handlers::search::semantic_search))
+        .route("/search", post(handlers::search::semantic_search))
         // Chat routes
-        .route("/api/v1/chat", post(handlers::chat::chat))
+        .route("/chat", post(handlers::chat::chat))
         // Analytics routes
-        .route("/api/v1/analytics", get(handlers::analytics::get_analytics));
+        .route("/analytics", get(handlers::analytics::get_analytics));
 
     // Add Swagger UI for API documentation
     let swagger = SwaggerUi::new("/swagger-ui")
